@@ -1,0 +1,33 @@
+{
+  "name" : "APEX Inspector",
+  "version" : "1.0",
+  "description" : "Inspect your APEX page at runtime",
+  "keywords" : ["oracle", "apex", "inspector", "developer", "tool"],
+  "homepage" : "https://github.com/martinbnielsen/apex-insepctor",
+  "bugs" : {
+    "url" : "https://github.com/martinbnielsen/apex-inspector/issues",
+    "email" : "martin@mbndata.dk"
+  },
+  "license" : "MIT",
+  "author" : {
+    "name" : "Martin B. Nielsen",
+    "email" : "martin@mbndata.dk",
+    "url" : "https://mbndata.dk"
+  },
+  "repository" : {
+    "type" : "git",
+    "url" : "https://github.com/martinbnielsen/apex-inspector.git"
+  },
+ "oracle" : {
+    "versions" : ["11.2.0.1", "12.1.0.1"],
+    "apex" : {
+      "versions" : ["22.1","22.2"],
+      "plugin" : {
+        "internalName" : "COM.MBNDATA.PLUGIN.INSPECTOR",
+        "type" : "dynamic action",
+        "demo" : "https://apex.oracle.com/pls/apex/f?p=42601:1",
+        "previewImage" : "https://raw.githubusercontent.com/martinbnielsen/apex-inspector/master/img/preview.gif"
+      }
+    }
+  }
+}

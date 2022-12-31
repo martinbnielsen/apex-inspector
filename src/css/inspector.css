@@ -1,0 +1,7 @@
+.mbnInspector-active {
+  color: greenyellow;
+}
+
+.mbnInspector-selected {
+  border: 2px solid limegreen;
+}
