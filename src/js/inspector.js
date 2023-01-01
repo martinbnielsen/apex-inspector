@@ -18,15 +18,45 @@ var mbninspector = {};
                                   '<button type="button" class="a-Button a-Button--devToolbar" id="mbnInspector" title="APEX Inspector" aria-label="APEX Inspector">' +
                                   '<span class="fa fa-hand-pointer-o" aria-hidden="true"></span>' +
                                   '</button></li>';
-      const _selSelectorClasses = ['t-Button','text_field','apex-item-text','t-Region','t-IRR-region'];
+      const _selSelectors       = [
+                                    {class: 't-Button',       type: 'BUTTON'},
+                                    {class: 'text_field',     type: 'ITEM'},
+                                    {class: 'apex-item-text', type: 'ITEM'},
+                                    {class: 't-Region',       type: 'REGION'},
+                                    {class: 't-IRR-region',   type: 'REGION'}
+                                  ];
 
       let _isActive = false;
       let _config = {
-        localItem: 'Hello'
+        delay: 800
       };
-      
-  
+      let _lastElement = null;
+      let _setTimeoutConst = null;
+
+      const myStorage = apex.storage.getScopedLocalStorage({ prefix: "APEX Inspector" });
+
       // Private functions
+
+      /**
+       * Show overlay
+       */
+      function _showInspection(event, el, type) {
+        let obj = {}
+        apex.debug.message(_logPrefix + 'Show overlay', event, el, type);
+
+        // Setup display object
+
+        // TODO: Make AJAX call to get server information
+
+        // Add client side information to the object
+        obj.type = type;
+        obj.id = el.attr('id');
+        if (type =='ITEM') {
+          obj.value = apex.items[el.attr('id')].getValue();
+        }
+        console.log(_logPrefix);
+        console.table(obj);
+      }
 
       /**
        * Handle togglings of the inspector (on/off)
@@ -34,53 +64,71 @@ var mbninspector = {};
       function _toggleActive() {
         apex.debug.log(_logPrefix + 'Toggle active');
 
-        // TODO: Make choice persistent using sessionstorage
-
         if (_isActive) {
           $(_selInspectorIcon + ' span').removeClass('mbnInspector-active');
+          $('.mbnInspector-selected').removeClass('mbnInspector-selected');      
           $(_selHover).off( "mouseenter mouseleave", _hoverHandler);
+          console.log(_logPrefix + 'Deactivated');
           _isActive = false;
+          myStorage.setItem( 'active', 'no');
         }
         else {
           $(_selInspectorIcon + ' span').addClass('mbnInspector-active');
           $(_selHover).on( "mouseenter mouseleave", _hoverHandler);
+          console.log(_logPrefix + 'Activated');
           _isActive = true;
+          _lastElement = null;
+          myStorage.setItem( 'active', 'yes');
         }
       }
 
       /**
-       * handler called upoj hover events
+       * handler called upon hover events
        */
       function _hoverHandler(event) { 
         let el = null;
+        let type = null;
     
-        for (let i = 0; i < _selSelectorClasses.length; i++) {
-          if ($(event.currentTarget).hasClass(_selSelectorClasses[i])) {
+        // Find hover over current element
+        for (let i = 0; i < _selSelectors.length; i++) {
+          if ($(event.currentTarget).hasClass(_selSelectors[i].class)) {
             el = $(event.currentTarget);
+            type = _selSelectors[i].type;
             break;
           }
         }
+
+        // If not found, then look for closest parent
         if (!el) {
-          for (let i = 0; i < _selSelectorClasses.length; i++) {
-            if ($(event.currentTarget).parent('.' + _selSelectorClasses[i]).length > 0) {
-              el = $(event.currentTarget).parent('.' + _selSelectorClasses[i]);
+          for (let i = 0; i < _selSelectors.length; i++) {
+            if ($(event.currentTarget).parent('.' + _selSelectors[i].class).length > 0) {
+              el = $(event.currentTarget).parent('.' + _selSelectors[i].class);
+              type = _selSelectors[i].type;
               break;
             }
           }
         }
-
-        if (!el) {
-          return;
+        
+        if (!el || el.is(_lastElement)) {
+          return; // Hover element is not of interest
         }
    
         if (event.type == 'mouseenter') {
+          if (_setTimeoutConst) {
+            clearTimeout(_setTimeoutConst);
+          }
           $('.mbnInspector-selected').removeClass('mbnInspector-selected');
           el.addClass('mbnInspector-selected');
-   
-          // TODO: Handle hover information box
+          _lastElement = el;
+          _setTimeoutConst = setTimeout(function() {
+            _showInspection(event, el, type);
+          }, _config.delay);
         }
         else {
           $('.mbnInspector-selected').removeClass('mbnInspector-selected');      
+          if (_setTimeoutConst) {
+            clearTimeout(_setTimeoutConst);
+          }
         }
       }
   
@@ -92,7 +140,7 @@ var mbninspector = {};
       mbninspector.init = function(config) {
   
           // Add the inspector icon to the apex developer toolbar
-          apex.debug.log(_logPrefix + 'Initializing', config);
+          apex.debug.message(_logPrefix + 'Initializing', config);
   
           // Set the config
           if (config.initJSCode) {
@@ -104,10 +152,13 @@ var mbninspector = {};
           $(_selAPEXToolbar + ' ul').append(_htmlInspectorIcon);
           $(_selAPEXToolbar).width($(_selAPEXToolbar).width() + 40);
           $(_selInspectorIcon).click(function() {
-            apex.debug.log(_logPrefix + 'Inspector icon clicked');       
+            apex.debug.message(_logPrefix + 'Inspector icon clicked');       
             _toggleActive();
           });
 
+          if (myStorage.getItem( 'active') == 'yes') {
+            _toggleActive();
+          }
       };
   
   })();
