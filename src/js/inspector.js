@@ -41,21 +41,32 @@ var mbninspector = {};
        * Show overlay
        */
       function _showInspection(event, el, type) {
-        let obj = {}
-        apex.debug.message(_logPrefix + 'Show overlay', event, el, type);
+        apex.debug.log(_logPrefix + 'Show overlay', event, el, type);
 
-        // Setup display object
-
-        // TODO: Make AJAX call to get server information
-
-        // Add client side information to the object
-        obj.type = type;
-        obj.id = el.attr('id');
-        if (type =='ITEM') {
-          obj.value = apex.items[el.attr('id')].getValue();
-        }
-        console.log(_logPrefix);
-        console.table(obj);
+        // Make AJAX call to get server information
+        apex.server.plugin(_config.ajaxIdentifier, {
+          x01: type,
+          x02: el.attr('id')
+          }, 
+          {
+            success: function (data) {
+              apex.debug.log(_logPrefix + 'Server response', data);
+         
+              // Add client side information to the object
+              data.type = type;
+              data.id = el.attr('id');
+              if (type =='ITEM') {
+                data.value = apex.items[el.attr('id')].getValue();
+              }
+              console.log(_logPrefix);
+              console.table(data);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              // handle error
+              apex.debug.log(_logPrefix + 'Server error', jqXHR, textStatus, errorThrown);
+            }
+        });
+        // Add client side information to the objec
       }
 
       /**
@@ -140,12 +151,14 @@ var mbninspector = {};
       mbninspector.init = function(config) {
   
           // Add the inspector icon to the apex developer toolbar
-          apex.debug.message(_logPrefix + 'Initializing', config);
+          apex.debug.log(_logPrefix + 'Initializing', config);
   
           // Set the config
+          _config = $.extend(_config, config);
           if (config.initJSCode) {
             _config = config.initJSCode(_config);
           }
+          
           apex.debug.log(_logPrefix + 'Final config', _config);
           
           // Initialize the inspector menu button
@@ -159,6 +172,8 @@ var mbninspector = {};
           if (myStorage.getItem( 'active') == 'yes') {
             _toggleActive();
           }
+
+          // TODO: Setup shortcut (configurable) to turn on/off
       };
   
   })();

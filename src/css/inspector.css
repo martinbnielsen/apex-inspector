@@ -2,6 +2,42 @@
   color: greenyellow;
 }
 
+/*
 .mbnInspector-selected {
   border: 2px solid limegreen;
 }
+*/
+
+.mbnInspector-selected {
+    border: 2px solid blue;
+    border-radius: 5px;
+    animation: 4s infinite glow;
+  }
+  @keyframes glow {
+    0% {
+      border-color: red;
+    }
+    25% {
+      border-color: blue;
+    }
+    75% {
+      border-color: yellow;
+    }
+    100% {
+      border-color: purple;
+    }
+  }
+  @-webkit-keyframes glow {
+    0% {
+      border-color: red;
+    }
+    25% {
+      border-color: blue;
+    }
+    75% {
+      border-color: yellow;
+    }
+    100% {
+      border-color: purple;
+    }
+  }
