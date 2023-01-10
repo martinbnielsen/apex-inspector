@@ -2,11 +2,6 @@
   color: greenyellow;
 }
 
-/*
-.mbnInspector-selected {
-  border: 2px solid limegreen;
-}
-*/
 
 .mbnInspector-selected {
     border: 2px solid blue;
@@ -27,6 +22,7 @@
       border-color: purple;
     }
   }
+
   @-webkit-keyframes glow {
     0% {
       border-color: red;
@@ -40,4 +36,15 @@
     100% {
       border-color: purple;
     }
+  }
+
+  #mbnInspectorOverlay {
+    position: absolute;
+    background-color: white;
+    opacity: 0.8;
+    border: 1px solid grey;
+    border-radius: 5px;
+    z-index: 9999;
+    padding: 10px;
+    overflow: scroll;
   }
